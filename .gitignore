@@ -1,0 +1,7 @@
+# Install media (populated by scripts/prepare-media.sh)
+media/
+
+# Build output
+out/
+*.exe
+*.log

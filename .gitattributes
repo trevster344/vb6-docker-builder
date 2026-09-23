@@ -1,0 +1,17 @@
+# Default: normalise to LF in the repository. This is a Linux-oriented repo
+# (the image is Ubuntu + Wine), so LF is what we want on checkout.
+* text=auto eol=lf
+
+# ACME setup table files are byte-sensitive and must never be converted.
+*.STF -text
+*.stf -text
+
+# Windows-side helper scripts.
+*.ps1 text eol=crlf
+
+# Shell scripts and container files must stay LF.
+*.sh text eol=lf
+Dockerfile text eol=lf
+*.dockerignore text eol=lf
+.gitignore text eol=lf
+.gitattributes text eol=lf
