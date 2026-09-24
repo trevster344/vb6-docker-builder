@@ -3,6 +3,7 @@
 #
 # Defaults to the parent directory of this repo (the repo is expected to live
 # inside the VB6 media folder, e.g. D:\PegasusNet - Trev Local\VB6\vb6-builder).
+# Override with VB6_MEDIA_SOURCE in .env (see env.example) or --source.
 #
 #   media/cd/   <- <source>/vb6studio_disk1  (pruned to the VB6 install subset)
 #   media/sp6/  <- <source>/VB6_Services_Packs/vs6sp6setup
@@ -14,7 +15,10 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-SOURCE="$REPO_DIR/.."
+# Local overrides: source .env if present (VB6_MEDIA_SOURCE).
+[ -f "$REPO_DIR/.env" ] && { set -a; . "$REPO_DIR/.env"; set +a; }
+
+SOURCE="${VB6_MEDIA_SOURCE:-$REPO_DIR/..}"
 FORCE=0
 
 while [ "$#" -gt 0 ]; do

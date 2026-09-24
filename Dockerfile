@@ -6,13 +6,14 @@
 # entrypoint.sh).
 #
 # Build context layout:
-#   media/cd/    Visual Studio 6 Enterprise CD (populated by scripts/prepare-media.sh)
-#   media/sp6/   VB6 Service Pack 6 CABs      (populated by scripts/prepare-media.sh)
 #   vendor/      setup response file (telyn_VB6.STF) + reference material
 #   scripts/     installer + component registration helpers
 #   entrypoint.sh  -> installed as /usr/local/bin/build-project.sh
 #
-#   docker build -t vb6-builder:sp6 .
+# The CD and SP6 install media are supplied as named build contexts (cd / sp6),
+# which build.sh wires up from media/cd + media/sp6 or from --cd/--sp6:
+#   docker build -t vb6-builder:sp6 \
+#     --build-context cd=media/cd --build-context sp6=media/sp6 .
 
 FROM ubuntu:22.04
 
@@ -40,9 +41,9 @@ ENV WINEPREFIX=/wine \
     DISPLAY=:99 \
     WINEDLLOVERRIDES=mscoree,mshtml=
 
-# Install media + tooling.
-COPY media/cd/ /media/cd/
-COPY media/sp6/ /media/sp6/
+# Install media + tooling. Media arrives via the named cd/sp6 build contexts.
+COPY --from=cd  / /media/cd/
+COPY --from=sp6 / /media/sp6/
 COPY vendor/ /vendor/
 COPY scripts/ /usr/local/bin/
 RUN chmod +x /usr/local/bin/*.sh
