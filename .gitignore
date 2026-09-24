@@ -1,3 +1,6 @@
+# Local media paths (see env.example)
+.env
+
 # Install media (populated by scripts/prepare-media.sh)
 media/
 

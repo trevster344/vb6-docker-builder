@@ -8,14 +8,41 @@ prefix **at image-build time**, so a build run starts in seconds.
 
 ## Build the image
 
-The installer media is not in this repo. Populate `media/` from a local copy of
-the media first (the repo is expected to live next to it):
+The installer media is not in this repo. You can either stage it into `media/`
+(gitignored) or point the build straight at your media.
+
+### Option 1 — stage into `media/` (default)
 
 ```bash
-./scripts/prepare-media.sh          # media/cd <- ../vb6studio_disk1
+./scripts/prepare-media.sh          # media/cd  <- ../vb6studio_disk1
                                     # media/sp6 <- ../VB6_Services_Packs/vs6sp6setup
 ./build.sh                          # docker build -t vb6-builder:sp6 .
 ```
+
+### Option 2 — point at your media (no copy)
+
+Copy `env.example` to `.env` and set the paths, then:
+
+```bash
+./build.sh
+```
+
+Or pass them inline:
+
+```bash
+./build.sh --cd ../vb6studio_disk1 --sp6 ../VB6_Services_Packs/vs6sp6setup
+```
+
+`build.sh` passes the CD/SP6 trees to Docker as **named build contexts**, so
+they never have to be copied into `media/`. This requires BuildKit (Docker 23+
+and Docker Desktop enable it by default). Supported `build.sh` options:
+
+| Option | Env var | Default |
+|---|---|---|
+| `--cd <dir>` | `VB6_CD` | `media/cd` |
+| `--sp6 <dir>` (alias `--sp`) | `VB6_SP6` | `media/sp6` |
+
+`prepare-media.sh` reads `VB6_MEDIA_SOURCE` (default `..`) as its `--source`.
 
 ## Build a project
 
@@ -83,6 +110,7 @@ the OMR project did.
 Dockerfile                 image definition
 entrypoint.sh              -> /usr/local/bin/build-project.sh (the build driver)
 build.sh                   convenience wrapper for `docker build`
+env.example                template for .env (VB6_CD / VB6_SP6 / VB6_MEDIA_SOURCE)
 scripts/
   prepare-media.sh         copy local VS6/SP6 media into media/
   install-vb6.sh           install VB6 + SP6 into the Wine prefix
